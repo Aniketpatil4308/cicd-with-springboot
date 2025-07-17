@@ -1,0 +1,43 @@
+services:
+
+  mysql-db:
+    image: mysql
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306"
+    networks:
+      - newapp-network
+    volumes:
+      - newmysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ 'CMD','mysqladmin','ping','-h','localhost' ]
+      timeout: 5s
+      retries: 2
+
+
+  myspring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: myspring-app
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "8081:8080"
+    networks:
+      - newapp-network
+
+volumes:
+  newmysql-data:
+
+networks:
+  newapp-network:
+    driver: bridge

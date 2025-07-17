@@ -1,0 +1,12 @@
+name: Hello workflow
+
+on: push
+
+jobs:
+
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: say Hello
+        run: echo "👋 Hello from GitHub Actions!"
+
